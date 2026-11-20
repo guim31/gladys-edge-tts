@@ -1,177 +1,603 @@
 {
   "manifest_version": 1,
-  "type": "device",
-  "name": "Demo Devices Template",
+  "type": "tts",
+  "name": "Microsoft Edge TTS",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "The free neural voices of Microsoft Edge for Gladys: 300 voices, no account, no API key.",
+    "fr": "Les voix neuronales gratuites de Microsoft Edge pour Gladys : 300 voix, sans compte ni clé.",
+    "de": "Die kostenlosen neuronalen Stimmen von Microsoft Edge für Gladys: 300 Stimmen, ohne Konto.",
+    "es": "Las voces neuronales gratuitas de Microsoft Edge para Gladys: 300 voces, sin cuenta ni clave."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
-  "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "docker_image": "ghcr.io/guim31/gladys-edge-tts:1.0.0",
+  "gladys_version": ">=5.3.0",
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-edge-tts/main/cover.png",
+  "categories": ["assistants"],
+  "keywords": [
+    "edge tts",
+    "microsoft edge",
+    "read aloud",
+    "lecture à voix haute",
+    "neural voices",
+    "voix neuronales",
+    "tts",
+    "text-to-speech",
+    "synthèse vocale"
+  ],
+  "transports": ["cloud"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "The neural voices of Microsoft Edge",
+        "fr": "Les voix neuronales de Microsoft Edge",
+        "de": "Die neuronalen Stimmen von Microsoft Edge",
+        "es": "Las voces neuronales de Microsoft Edge"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "No account or key: the voices of the \"Read aloud\" function of Edge, as with edge-tts. Unofficial and undocumented: Microsoft may change or cut it. Texts are sent to Microsoft. Then select this voice on the Artificial Intelligence page.",
+        "fr": "Sans compte ni clé : les voix de la fonction « Lecture à voix haute » d'Edge, comme edge-tts. Non officiel et non documenté : Microsoft peut le changer ou le couper. Les textes sont envoyés à Microsoft. Choisissez ensuite cette voix sur la page Intelligence Artificielle.",
+        "de": "Ohne Konto und Schlüssel: die Stimmen der Funktion „Laut vorlesen“ von Edge, wie bei edge-tts. Inoffiziell und undokumentiert: Microsoft kann es ändern oder abschalten. Die Texte gehen an Microsoft. Wähle die Stimme dann auf der Seite Künstliche Intelligenz.",
+        "es": "Sin cuenta ni clave: las voces de la función «Leer en voz alta» de Edge, como edge-tts. No oficial ni documentado: Microsoft puede cambiarlo o cortarlo. Los textos se envían a Microsoft. Después, elija esta voz en la página Inteligencia artificial."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://www.microsoft.com/privacy/privacystatement",
+          "label": {
+            "en": "Microsoft privacy statement",
+            "fr": "Déclaration de confidentialité de Microsoft",
+            "de": "Datenschutzerklärung von Microsoft",
+            "es": "Declaración de privacidad de Microsoft"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
-    },
-    {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
+      "key": "voice",
       "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
+      "label": {
+        "en": "Voice",
+        "fr": "Voix",
+        "de": "Stimme",
+        "es": "Voz"
+      },
+      "description": {
+        "en": "Automatic: a voice in the language of the user Gladys answers, or of the first administrator for an announcement (French when unknown).",
+        "fr": "Automatique : une voix dans la langue de l'utilisateur à qui Gladys répond, ou du premier administrateur pour une annonce (français si inconnue).",
+        "de": "Automatisch: eine Stimme in der Sprache des Benutzers, dem Gladys antwortet, bei einer Ansage die des ersten Administrators (sonst Französisch).",
+        "es": "Automático: una voz en el idioma del usuario al que responde Gladys, o del primer administrador para un anuncio (francés si se desconoce)."
+      },
       "required": false,
-      "default": "celsius",
+      "default": "auto",
       "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+        {
+          "value": "auto",
+          "label": {
+            "en": "Automatic",
+            "fr": "Automatique",
+            "de": "Automatisch",
+            "es": "Automático"
+          }
+        },
+        {
+          "value": "fr-FR-DeniseNeural",
+          "label": {
+            "en": "Denise (fr-FR, female)",
+            "fr": "Denise (fr-FR, féminine)",
+            "de": "Denise (fr-FR, weiblich)",
+            "es": "Denise (fr-FR, femenina)"
+          }
+        },
+        {
+          "value": "fr-FR-EloiseNeural",
+          "label": {
+            "en": "Eloise (fr-FR, female)",
+            "fr": "Eloise (fr-FR, féminine)",
+            "de": "Eloise (fr-FR, weiblich)",
+            "es": "Eloise (fr-FR, femenina)"
+          }
+        },
+        {
+          "value": "fr-FR-VivienneMultilingualNeural",
+          "label": {
+            "en": "Vivienne multilingual (fr-FR, female)",
+            "fr": "Vivienne multilingue (fr-FR, féminine)",
+            "de": "Vivienne mehrsprachig (fr-FR, weiblich)",
+            "es": "Vivienne multilingüe (fr-FR, femenina)"
+          }
+        },
+        {
+          "value": "fr-FR-HenriNeural",
+          "label": {
+            "en": "Henri (fr-FR, male)",
+            "fr": "Henri (fr-FR, masculine)",
+            "de": "Henri (fr-FR, männlich)",
+            "es": "Henri (fr-FR, masculina)"
+          }
+        },
+        {
+          "value": "fr-FR-RemyMultilingualNeural",
+          "label": {
+            "en": "Remy multilingual (fr-FR, male)",
+            "fr": "Remy multilingue (fr-FR, masculine)",
+            "de": "Remy mehrsprachig (fr-FR, männlich)",
+            "es": "Remy multilingüe (fr-FR, masculina)"
+          }
+        },
+        {
+          "value": "fr-BE-CharlineNeural",
+          "label": {
+            "en": "Charline (fr-BE, female)",
+            "fr": "Charline (fr-BE, féminine)",
+            "de": "Charline (fr-BE, weiblich)",
+            "es": "Charline (fr-BE, femenina)"
+          }
+        },
+        {
+          "value": "fr-BE-GerardNeural",
+          "label": {
+            "en": "Gerard (fr-BE, male)",
+            "fr": "Gerard (fr-BE, masculine)",
+            "de": "Gerard (fr-BE, männlich)",
+            "es": "Gerard (fr-BE, masculina)"
+          }
+        },
+        {
+          "value": "fr-CH-ArianeNeural",
+          "label": {
+            "en": "Ariane (fr-CH, female)",
+            "fr": "Ariane (fr-CH, féminine)",
+            "de": "Ariane (fr-CH, weiblich)",
+            "es": "Ariane (fr-CH, femenina)"
+          }
+        },
+        {
+          "value": "fr-CH-FabriceNeural",
+          "label": {
+            "en": "Fabrice (fr-CH, male)",
+            "fr": "Fabrice (fr-CH, masculine)",
+            "de": "Fabrice (fr-CH, männlich)",
+            "es": "Fabrice (fr-CH, masculina)"
+          }
+        },
+        {
+          "value": "fr-CA-SylvieNeural",
+          "label": {
+            "en": "Sylvie (fr-CA, female)",
+            "fr": "Sylvie (fr-CA, féminine)",
+            "de": "Sylvie (fr-CA, weiblich)",
+            "es": "Sylvie (fr-CA, femenina)"
+          }
+        },
+        {
+          "value": "fr-CA-AntoineNeural",
+          "label": {
+            "en": "Antoine (fr-CA, male)",
+            "fr": "Antoine (fr-CA, masculine)",
+            "de": "Antoine (fr-CA, männlich)",
+            "es": "Antoine (fr-CA, masculina)"
+          }
+        },
+        {
+          "value": "fr-CA-JeanNeural",
+          "label": {
+            "en": "Jean (fr-CA, male)",
+            "fr": "Jean (fr-CA, masculine)",
+            "de": "Jean (fr-CA, männlich)",
+            "es": "Jean (fr-CA, masculina)"
+          }
+        },
+        {
+          "value": "fr-CA-ThierryNeural",
+          "label": {
+            "en": "Thierry (fr-CA, male)",
+            "fr": "Thierry (fr-CA, masculine)",
+            "de": "Thierry (fr-CA, männlich)",
+            "es": "Thierry (fr-CA, masculina)"
+          }
+        },
+        {
+          "value": "en-US-AvaNeural",
+          "label": {
+            "en": "Ava (en-US, female)",
+            "fr": "Ava (en-US, féminine)",
+            "de": "Ava (en-US, weiblich)",
+            "es": "Ava (en-US, femenina)"
+          }
+        },
+        {
+          "value": "en-US-EmmaNeural",
+          "label": {
+            "en": "Emma (en-US, female)",
+            "fr": "Emma (en-US, féminine)",
+            "de": "Emma (en-US, weiblich)",
+            "es": "Emma (en-US, femenina)"
+          }
+        },
+        {
+          "value": "en-US-JennyNeural",
+          "label": {
+            "en": "Jenny (en-US, female)",
+            "fr": "Jenny (en-US, féminine)",
+            "de": "Jenny (en-US, weiblich)",
+            "es": "Jenny (en-US, femenina)"
+          }
+        },
+        {
+          "value": "en-US-AndrewNeural",
+          "label": {
+            "en": "Andrew (en-US, male)",
+            "fr": "Andrew (en-US, masculine)",
+            "de": "Andrew (en-US, männlich)",
+            "es": "Andrew (en-US, masculina)"
+          }
+        },
+        {
+          "value": "en-US-BrianNeural",
+          "label": {
+            "en": "Brian (en-US, male)",
+            "fr": "Brian (en-US, masculine)",
+            "de": "Brian (en-US, männlich)",
+            "es": "Brian (en-US, masculina)"
+          }
+        },
+        {
+          "value": "en-US-GuyNeural",
+          "label": {
+            "en": "Guy (en-US, male)",
+            "fr": "Guy (en-US, masculine)",
+            "de": "Guy (en-US, männlich)",
+            "es": "Guy (en-US, masculina)"
+          }
+        },
+        {
+          "value": "en-GB-SoniaNeural",
+          "label": {
+            "en": "Sonia (en-GB, female)",
+            "fr": "Sonia (en-GB, féminine)",
+            "de": "Sonia (en-GB, weiblich)",
+            "es": "Sonia (en-GB, femenina)"
+          }
+        },
+        {
+          "value": "en-GB-LibbyNeural",
+          "label": {
+            "en": "Libby (en-GB, female)",
+            "fr": "Libby (en-GB, féminine)",
+            "de": "Libby (en-GB, weiblich)",
+            "es": "Libby (en-GB, femenina)"
+          }
+        },
+        {
+          "value": "en-GB-RyanNeural",
+          "label": {
+            "en": "Ryan (en-GB, male)",
+            "fr": "Ryan (en-GB, masculine)",
+            "de": "Ryan (en-GB, männlich)",
+            "es": "Ryan (en-GB, masculina)"
+          }
+        },
+        {
+          "value": "de-DE-TanjaNeural",
+          "label": {
+            "en": "Tanja (de-DE, female)",
+            "fr": "Tanja (de-DE, féminine)",
+            "de": "Tanja (de-DE, weiblich)",
+            "es": "Tanja (de-DE, femenina)"
+          }
+        },
+        {
+          "value": "de-DE-ChristophNeural",
+          "label": {
+            "en": "Christoph (de-DE, male)",
+            "fr": "Christoph (de-DE, masculine)",
+            "de": "Christoph (de-DE, männlich)",
+            "es": "Christoph (de-DE, masculina)"
+          }
+        },
+        {
+          "value": "es-ES-ElviraNeural",
+          "label": {
+            "en": "Elvira (es-ES, female)",
+            "fr": "Elvira (es-ES, féminine)",
+            "de": "Elvira (es-ES, weiblich)",
+            "es": "Elvira (es-ES, femenina)"
+          }
+        },
+        {
+          "value": "es-ES-XimenaNeural",
+          "label": {
+            "en": "Ximena (es-ES, female)",
+            "fr": "Ximena (es-ES, féminine)",
+            "de": "Ximena (es-ES, weiblich)",
+            "es": "Ximena (es-ES, femenina)"
+          }
+        },
+        {
+          "value": "es-ES-AlvaroNeural",
+          "label": {
+            "en": "Alvaro (es-ES, male)",
+            "fr": "Alvaro (es-ES, masculine)",
+            "de": "Alvaro (es-ES, männlich)",
+            "es": "Alvaro (es-ES, masculina)"
+          }
+        },
+        {
+          "value": "es-MX-DaliaNeural",
+          "label": {
+            "en": "Dalia (es-MX, female)",
+            "fr": "Dalia (es-MX, féminine)",
+            "de": "Dalia (es-MX, weiblich)",
+            "es": "Dalia (es-MX, femenina)"
+          }
+        },
+        {
+          "value": "es-MX-JorgeNeural",
+          "label": {
+            "en": "Jorge (es-MX, male)",
+            "fr": "Jorge (es-MX, masculine)",
+            "de": "Jorge (es-MX, männlich)",
+            "es": "Jorge (es-MX, masculina)"
+          }
+        },
+        {
+          "value": "it-IT-ElsaNeural",
+          "label": {
+            "en": "Elsa (it-IT, female)",
+            "fr": "Elsa (it-IT, féminine)",
+            "de": "Elsa (it-IT, weiblich)",
+            "es": "Elsa (it-IT, femenina)"
+          }
+        },
+        {
+          "value": "it-IT-IsabellaNeural",
+          "label": {
+            "en": "Isabella (it-IT, female)",
+            "fr": "Isabella (it-IT, féminine)",
+            "de": "Isabella (it-IT, weiblich)",
+            "es": "Isabella (it-IT, femenina)"
+          }
+        },
+        {
+          "value": "it-IT-DiegoNeural",
+          "label": {
+            "en": "Diego (it-IT, male)",
+            "fr": "Diego (it-IT, masculine)",
+            "de": "Diego (it-IT, männlich)",
+            "es": "Diego (it-IT, masculina)"
+          }
+        },
+        {
+          "value": "nl-NL-FennaNeural",
+          "label": {
+            "en": "Fenna (nl-NL, female)",
+            "fr": "Fenna (nl-NL, féminine)",
+            "de": "Fenna (nl-NL, weiblich)",
+            "es": "Fenna (nl-NL, femenina)"
+          }
+        },
+        {
+          "value": "nl-NL-MaartenNeural",
+          "label": {
+            "en": "Maarten (nl-NL, male)",
+            "fr": "Maarten (nl-NL, masculine)",
+            "de": "Maarten (nl-NL, männlich)",
+            "es": "Maarten (nl-NL, masculina)"
+          }
+        },
+        {
+          "value": "pt-PT-RaquelNeural",
+          "label": {
+            "en": "Raquel (pt-PT, female)",
+            "fr": "Raquel (pt-PT, féminine)",
+            "de": "Raquel (pt-PT, weiblich)",
+            "es": "Raquel (pt-PT, femenina)"
+          }
+        },
+        {
+          "value": "pt-PT-DuarteNeural",
+          "label": {
+            "en": "Duarte (pt-PT, male)",
+            "fr": "Duarte (pt-PT, masculine)",
+            "de": "Duarte (pt-PT, männlich)",
+            "es": "Duarte (pt-PT, masculina)"
+          }
+        },
+        {
+          "value": "pt-BR-FranciscaNeural",
+          "label": {
+            "en": "Francisca (pt-BR, female)",
+            "fr": "Francisca (pt-BR, féminine)",
+            "de": "Francisca (pt-BR, weiblich)",
+            "es": "Francisca (pt-BR, femenina)"
+          }
+        },
+        {
+          "value": "pt-BR-AntonioNeural",
+          "label": {
+            "en": "Antonio (pt-BR, male)",
+            "fr": "Antonio (pt-BR, masculine)",
+            "de": "Antonio (pt-BR, männlich)",
+            "es": "Antonio (pt-BR, masculina)"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "gender",
+      "type": "select",
+      "label": {
+        "en": "Automatic voice",
+        "fr": "Voix automatique",
+        "de": "Automatische Stimme",
+        "es": "Voz automática"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "In automatic mode, a female or a male voice.",
+        "fr": "En mode automatique, une voix féminine ou masculine.",
+        "de": "Im automatischen Modus eine weibliche oder männliche Stimme.",
+        "es": "En modo automático, una voz femenina o masculina."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": "female",
+      "options": [
+        {
+          "value": "female",
+          "label": {
+            "en": "Female",
+            "fr": "Féminine",
+            "de": "Weiblich",
+            "es": "Femenina"
+          }
+        },
+        {
+          "value": "male",
+          "label": {
+            "en": "Male",
+            "fr": "Masculine",
+            "de": "Männlich",
+            "es": "Masculina"
+          }
+        }
+      ]
+    },
+    {
+      "key": "custom_voice",
+      "type": "string",
+      "label": {
+        "en": "Other voice",
+        "fr": "Autre voix",
+        "de": "Andere Stimme",
+        "es": "Otra voz"
+      },
+      "description": {
+        "en": "Any other Edge voice, by its name (the \"List the voices\" button below gives them). Replaces the choice above.",
+        "fr": "Toute autre voix Edge, par son nom (le bouton « Lister les voix » ci-dessous les donne). Remplace le choix ci-dessus.",
+        "de": "Jede andere Edge-Stimme, über ihren Namen (die Taste „Stimmen auflisten“ unten nennt sie). Ersetzt die Auswahl oben.",
+        "es": "Cualquier otra voz de Edge, por su nombre (el botón «Listar las voces» de abajo las da). Sustituye la elección de arriba."
+      },
+      "placeholder": {
+        "en": "it-IT-ElsaNeural",
+        "fr": "it-IT-ElsaNeural",
+        "de": "it-IT-ElsaNeural",
+        "es": "it-IT-ElsaNeural"
+      },
+      "required": false,
+      "default": ""
+    },
+    {
+      "key": "rate",
+      "type": "number",
+      "label": {
+        "en": "Speed (%)",
+        "fr": "Débit (%)",
+        "de": "Tempo (%)",
+        "es": "Velocidad (%)"
+      },
+      "description": {
+        "en": "From -50 (slower) to +100 (faster); 0 is the usual speed of the voice.",
+        "fr": "De -50 (plus lent) à +100 (plus rapide) ; 0 est le débit habituel de la voix.",
+        "de": "Von -50 (langsamer) bis +100 (schneller); 0 ist das übliche Tempo der Stimme.",
+        "es": "De -50 (más lento) a +100 (más rápido); 0 es la velocidad habitual de la voz."
+      },
+      "required": false,
+      "default": 0,
+      "min": -50,
+      "max": 100
+    },
+    {
+      "key": "pitch",
+      "type": "number",
+      "label": {
+        "en": "Pitch (Hz)",
+        "fr": "Hauteur (Hz)",
+        "de": "Tonhöhe (Hz)",
+        "es": "Tono (Hz)"
+      },
+      "description": {
+        "en": "From -50 (lower) to +50 (higher); 0 is the usual pitch of the voice.",
+        "fr": "De -50 (plus grave) à +50 (plus aigu) ; 0 est la hauteur habituelle de la voix.",
+        "de": "Von -50 (tiefer) bis +50 (höher); 0 ist die übliche Tonhöhe der Stimme.",
+        "es": "De -50 (más grave) a +50 (más agudo); 0 es el tono habitual de la voz."
+      },
+      "required": false,
+      "default": 0,
+      "min": -50,
+      "max": 50
+    },
+    {
+      "key": "volume",
+      "type": "number",
+      "label": {
+        "en": "Volume (%)",
+        "fr": "Volume (%)",
+        "de": "Lautstärke (%)",
+        "es": "Volumen (%)"
+      },
+      "description": {
+        "en": "From -50 (quieter) to +50 (louder), relative to the clip; the speaker volume stays its own.",
+        "fr": "De -50 (plus bas) à +50 (plus fort), dans le clip ; le volume de l'enceinte reste le sien.",
+        "de": "Von -50 (leiser) bis +50 (lauter), im Clip; die Lautstärke des Lautsprechers bleibt ihre eigene.",
+        "es": "De -50 (más bajo) a +50 (más alto), en el clip; el volumen del altavoz sigue siendo el suyo."
+      },
+      "required": false,
+      "default": 0,
+      "min": -50,
+      "max": 50
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
+      "key": "test_voice",
+      "label": {
+        "en": "Test the voice",
+        "fr": "Tester la voix",
+        "de": "Stimme testen",
+        "es": "Probar la voz"
+      },
+      "description": {
+        "en": "Asks Microsoft Edge for a test sentence with the saved settings and shows the result (save first).",
+        "fr": "Demande une phrase de test à Microsoft Edge avec les réglages enregistrés et affiche le résultat (enregistrez d'abord).",
+        "de": "Fragt bei Microsoft Edge einen Testsatz mit den gespeicherten Einstellungen an und zeigt das Ergebnis (zuerst speichern).",
+        "es": "Pide a Microsoft Edge una frase de prueba con los ajustes guardados y muestra el resultado (guarde primero)."
+      },
+      "timeout_seconds": 40
     },
     {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
-    }
-  ],
-  "scene_triggers": [
-    {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
-      "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+      "key": "list_voices",
+      "label": {
+        "en": "List the voices",
+        "fr": "Lister les voix",
+        "de": "Stimmen auflisten",
+        "es": "Listar las voces"
       },
+      "description": {
+        "en": "Gives the names of the Edge voices of a language, to copy into \"Other voice\".",
+        "fr": "Donne le nom des voix Edge d'une langue, à copier dans « Autre voix ».",
+        "de": "Nennt die Namen der Edge-Stimmen einer Sprache, zum Kopieren in „Andere Stimme“.",
+        "es": "Da los nombres de las voces de Edge de un idioma, para copiarlos en «Otra voz»."
+      },
+      "timeout_seconds": 30,
       "fields": [
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
-        },
-        {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
-          "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
-          ]
-        }
-      ],
-      "variables": [
-        {
-          "key": "target",
+          "key": "language",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
-        }
-      ]
-    }
-  ],
-  "scene_actions": [
-    {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
-      },
-      "timeout_seconds": 15,
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
+          "label": {
+            "en": "Language code",
+            "fr": "Code de langue",
+            "de": "Sprachcode",
+            "es": "Código de idioma"
+          },
+          "placeholder": {
+            "en": "it, pt-BR",
+            "fr": "it, pt-BR",
+            "de": "it, pt-BR",
+            "es": "it, pt-BR"
+          },
           "required": true
         }
-      ],
-      "outputs": [
-        {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
-        }
       ]
-    }
-  ],
-  "widgets": [
-    {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
-      },
-      "icon": "activity",
-      "action_timeout_seconds": 15
     }
   ]
 }

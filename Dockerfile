@@ -23,6 +23,9 @@ RUN npm ci --omit=dev || npm install --omit=dev
 COPY index.js ./
 COPY src ./src
 COPY gladys-assistant-integration.json ./
+# src/edge/token.js is LGPL-3.0-or-later: its license texts ship with the image.
+COPY LICENSE ./
+COPY LICENSES ./LICENSES
 
 # The only writable location allowed at runtime. Docker creates a new volume
 # with the owner of the image's /data, so it must belong to `node`, and before
