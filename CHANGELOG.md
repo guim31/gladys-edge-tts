@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-20
+
 ### Added
 
 - Gladys speaks with the free neural voices of Microsoft Edge ("Read aloud", no
@@ -28,3 +30,6 @@ the notes of the version's GitHub Release.
 - Supervision shows whether Microsoft Edge answers, and why not (unknown voice,
   no Internet, service changed).
 - "Test the voice" and "List the voices" buttons in the configuration screen.
+
+[Unreleased]: https://github.com/guim31/gladys-edge-tts/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-edge-tts/releases/tag/v1.0.0
