@@ -1,67 +1,91 @@
-# Template de démonstration
+# Microsoft Edge TTS
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+Donne à Gladys les **voix neuronales de Microsoft Edge**, celles de la fonction
+« Lecture à voix haute » du navigateur : les annonces des scènes sont
+prononcées par elles sur vos enceintes. Gratuit, sans compte ni clé d'API,
+comme la bibliothèque `edge-tts` et l'intégration Home Assistant qui
+l'utilise.
 
 ## Ce que vous obtenez
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+- Une **voix pour Gladys** (Gladys 5.3.0 ou plus récent) : une fois choisie,
+  l'action de scène **Parler sur une enceinte** parle avec une voix Edge sur
+  vos enceintes (Sonos, Google Cast, AirPlay…).
+- **Plus de 300 voix dans 75 langues**, très naturelles : par défaut une voix
+  dans la langue de chaque utilisateur (Denise ou Henri en français), féminine
+  ou masculine, ou une voix imposée (Vivienne, Eloise, Rémy, voix belges,
+  suisses, canadiennes…), ou n'importe quelle autre voix Edge par son nom.
+- Le **débit**, la **hauteur** et le **volume** de la voix se règlent.
+- Les textes longs (jusqu'aux 2 000 caractères que Gladys envoie) sont coupés
+  en fin de phrase et réunis en un seul clip.
+
+## Avant de commencer : ce qu'est ce service
+
+- C'est le service de **Lecture à voix haute de Microsoft Edge**, utilisé
+  comme `edge-tts` le fait. Ce **n'est pas un service officiel ni documenté** :
+  aucune garantie, et Microsoft peut le changer, le limiter ou le couper à tout
+  moment. L'intégration échoue alors de façon visible (Supervision, journal
+  des scènes) ; une mise à jour de l'intégration peut être nécessaire.
+- **Chaque texte prononcé est envoyé à Microsoft** (avec l'adresse IP de votre
+  connexion), selon la
+  [déclaration de confidentialité de Microsoft](https://www.microsoft.com/privacy/privacystatement).
+  Ne l'utilisez pas pour des textes que vous voulez garder chez vous.
+- Une connexion Internet est nécessaire.
+- Sans lien avec Microsoft. Microsoft Edge est une marque de Microsoft
+  Corporation.
 
 ## Configuration
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+1. Installez l'intégration depuis le catalogue, puis ouvrez son onglet
+   **Configuration**.
+2. **Voix** : **Automatique** parle la langue de l'utilisateur à qui Gladys
+   répond, et celle du premier administrateur pour une annonce de scène (le
+   français si Gladys ne la connaît pas). Ou choisissez une voix dans la liste.
+3. **Voix automatique** : féminine ou masculine, en mode automatique.
+4. **Autre voix** : le nom de n'importe quelle voix Edge (par exemple
+   `it-IT-ElsaNeural`) ; elle remplace le choix de la liste. Le bouton
+   **Lister les voix** donne les noms des voix d'une langue : saisissez un code
+   comme `it` ou `pt-BR`.
+5. **Débit**, **Hauteur** et **Volume** : 0 garde la voix telle quelle. Le
+   volume se règle dans le clip ; celui de l'enceinte ne change pas.
+6. Enregistrez, puis appuyez sur **Tester la voix** : une phrase de test est
+   demandée à Microsoft et la durée du clip reçu s'affiche.
+7. Ouvrez **Intégrations → Intelligence Artificielle** et choisissez
+   **Microsoft Edge TTS** dans la carte **Voix**.
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+## Utilisation dans les scènes
 
-## Actions
+Ajoutez une action **Parler sur une enceinte** à une scène, choisissez une
+enceinte et saisissez le texte. Gladys demande le clip à cette intégration,
+puis le sert à l'enceinte sur votre réseau local.
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+L'assistant vocal de Gladys reste en texte seul avec une intégration de voix :
+sa page tourne en HTTPS, et le clip est servi sur le réseau local en HTTP, ce
+que le navigateur bloque. C'est une limite de Gladys, la même pour toutes les
+intégrations de voix.
 
-## Scènes
+## Limites
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
-
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
-
-## Tableau de bord
-
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+- Une phrase prend environ **1 seconde**. Un texte long est envoyé par parties
+  d'au plus 800 caractères, **une à la fois** : les 2 000 caractères que
+  Gladys envoie au plus font 3 parties, une quinzaine de secondes et un clip
+  d'environ 1 Mo pour 3 minutes, sous les 30 secondes que Gladys attend.
+- Un clip déjà fait (même texte, même voix, mêmes réglages) est gardé en
+  mémoire (les 16 derniers), et une annonce sur plusieurs enceintes ne
+  sollicite Microsoft qu'une fois.
+- La liste des voix est lue au plus une fois par jour, et seulement si
+  nécessaire (bouton **Lister les voix**, langue sans voix par défaut).
+- Développée et testée contre le vrai service, sans enceinte ni instance
+  Gladys réelle : vos retours sont les bienvenus.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- La **Supervision** indique si Microsoft Edge répond et, sinon, pourquoi
+  (pas d'Internet, voix inconnue, le service a changé…).
+- « Microsoft Edge ne connaît pas cette voix » : vérifiez l'orthographe exacte
+  du champ **Autre voix**, ou videz-le.
+- « Microsoft refuse la connexion » : le service a changé ou limite votre
+  connexion ; cherchez une mise à jour de l'intégration.
+- Une annonce en échec est écrite dans les **journaux** de l'intégration, et
+  l'action de scène échoue dans le journal des scènes.
+- Démarrez le conteneur avec `LOG_LEVEL=debug` pour voir chaque requête.

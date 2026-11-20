@@ -31,16 +31,18 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
-src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
-gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+index.js                          SDK wiring only (EdgeTts + registerHandlers)
+src/app.js                        handlers: onTtsSynthesize, actions, config, lifecycle
+src/integration.js                EdgeTts: voice choice, cache, status, the two buttons
+src/edge/client.js                Read Aloud client: WebSocket session, voice list, clock sync
+src/edge/token.js                 Sec-MS-GEC token (LGPL-3.0-or-later port of edge-tts)
+src/config.js                     DEFAULT_CONFIG (mirrors the manifest), voices, voiceFor()
+src/split.js                      cutting a long text at sentence ends
+src/mp3.js                        MPEG frame parsing (duration, joining clips)
+src/lifecycle.js                  exit on an unhandled rejection
+gladys-assistant-integration.json manifest: type "tts", config_schema, actions
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (mandatory)
+test/                             node --test, fake WebSocket replaying real sessions
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -107,6 +109,29 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
   sont ceux du template : ne pas les modifier.
 - Le dépôt est **public** : aucun secret, aucune adresse ni détail d'infrastructure privée, ni
   ici, ni dans les tests, ni dans les captures.
+
+## Microsoft Edge Read Aloud (vérifié le 20/11/2026)
+
+- Protocole repris d'edge-tts (rany2/edge-tts, LGPLv3) : WebSocket
+  `wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1`, paramètres
+  `TrustedClientToken`, `ConnectionId`, `Sec-MS-GEC`, `Sec-MS-GEC-Version=2-<version Chromium>`, en-têtes
+  d'Edge (`Origin` de l'extension, `User-Agent`, cookie `muid` aléatoire). Le **WebSocket natif de Node**
+  (undici) accepte `new WebSocket(url, { headers })` : aucune dépendance `ws`.
+- **Jeton v2** depuis le 13/10/2026 (edge-tts `ba61d94`) : SHA-256 modifié + CS64, porté dans
+  `src/edge/token.js`, donc ce fichier est **LGPL-3.0-or-later** (textes dans `LICENSES/`, copiés dans
+  l'image). Si Microsoft change le jeton, comparer à `drm.py` et mettre à jour `test/token.test.js` avec
+  des valeurs imprimées par edge-tts.
+- Une poignée de main refusée (jeton périmé, horloge fausse) ne donne **aucun statut** côté WebSocket
+  (événement `error` vide, close 1006) : le client lit alors le `Date` de `voices/list` (qui ne vérifie
+  pas le jeton) pour corriger l'horloge, réessaie une fois, puis classe `refused` ; si `voices/list`
+  échoue aussi, c'est `unreachable`.
+- Voix inconnue : close **1007** « Unsupported voice X. » après `turn.start`. Sortie
+  `audio-24khz-48kbitrate-mono-mp3`, MPEG-2 L3 sans en-tête Xing : les clips se concatènent.
+- edge-tts limite à 4 096 octets de texte échappé par requête ; ici 800 unités UTF-16 par partie. Une
+  phrase ≈ 1 s ; 2 389 caractères = 3 parties en 18,7 s (budget 25 s, Gladys attend 30 s).
+- 318 voix, 75 langues le 20/11/2026 (`test/fixtures/voices.json`) ; les voix de `de-DE` ne sont plus
+  que Tanja et Christoph (Katja, Conrad absentes). `test/config.test.js` vérifie que chaque voix nommée
+  par le code existe dans la fixture : à rafraîchir si Microsoft retire une voix.
 
 ## Pièges du cœur Gladys
 

@@ -12,53 +12,19 @@ the notes of the version's GitHub Release.
 
 ### Added
 
-- A working example of scene triggers, scene actions and dashboard widgets
-  (Gladys 5.1.0 or later).
-- `CHANGELOG.md`, rolled by the Release workflow.
-- A GitHub Release for every version, with its changelog section as notes: the
-  Gladys Supervision page links each version to the repository's releases.
-- CI runs the tests on Node 22 and 24, and builds the Docker image.
-- Dependabot keeps the npm dependencies and the GitHub Actions up to date.
-- `SECURITY.md` (how to report a vulnerability) and `CLAUDE.md` (project rules
-  for contributors and coding assistants).
-- Manifest tests: `version` matches `package.json`, `docker_image` is tagged
-  with it, descriptions hold 10 to 100 characters, placeholders are
-  multi-language objects.
-- The latitude and longitude fields show an example value as placeholder.
-
-### Changed
-
-- Node.js 22 or later is required (Node 20 is end-of-life).
-- Integration SDK 0.16.1. The tests now run against the fake Gladys of the
-  SDK, which refuses the payloads Gladys refuses, including a device feature
-  missing `name`, `min`, `max`, `read_only` or `has_feedback`. A device
-  published with a `poll_frequency` is now polled without `should_poll: true`
-  on a recent core (an explicit `should_poll: false` opts out); the template
-  keeps the field explicit for the older cores.
-- The refresh interval is one minute minimum, the fastest Gladys polls a
-  device. The plug's power is only sent when it changes, and every 30
-  minutes otherwise.
-
-### Fixed
-
-- The switch, the light, the plug, the motion sensor and the camera could not
-  be added from the Discovery tab: their on/off, motion and image features had
-  no `min`/`max`, which Gladys requires (HTTP 422 "t_device_feature.min cannot
-  be null"). A test now checks that every feature carries the columns Gladys
-  needs to create it.
-- Gladys refused the devices of the Discovery tab: the weather station and
-  the plug declared their poll frequency in seconds instead of one of the
-  values Gladys accepts, and were never polled. They now poll every minute,
-  and the readings follow the refresh interval of the configuration.
-
-- The release commit no longer fails `npm run format:check`: the Release
-  workflow updates the manifest `version` and `docker_image` in place instead
-  of re-printing the whole file with `jq`.
-- The integration can write to `/data`: the image creates the directory owned
-  by the `node` user, a new Docker volume was owned by root.
-- A sub-container running the integration's own image follows it to the new
-  tag at each release, as well as in the manifest of the build summary: it kept
-  the previous tag, which may not exist on the registry. Sub-containers on a
-  third-party image (a broker, a database...) keep theirs.
-
-[Unreleased]: https://github.com/GladysAssistant/integration-template-js/commits/main
+- Gladys speaks with the free neural voices of Microsoft Edge ("Read aloud", no
+  account, no API key): scene announcements ("Speak on a speaker") on your
+  speakers, once the voice is selected on the Artificial Intelligence page
+  (Gladys 5.3.0 or later). Unofficial service.
+- Voice: automatic (a female or male voice in the language of the user, or of
+  the first administrator for an announcement; over 300 voices in 75
+  languages), one of 38 voices of the list, or any other Edge voice by its
+  name.
+- Speed, pitch and volume of the voice.
+- Long texts (up to the 2,000 characters Gladys sends) are cut at the end of
+  sentences, requested one at a time and joined into a single clip.
+- A clip already made is served from memory, and one announcement on several
+  speakers asks Microsoft once.
+- Supervision shows whether Microsoft Edge answers, and why not (unknown voice,
+  no Internet, service changed).
+- "Test the voice" and "List the voices" buttons in the configuration screen.
