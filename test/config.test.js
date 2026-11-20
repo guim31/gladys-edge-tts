@@ -4,6 +4,7 @@ import {
   AUTO_VOICES,
   DEFAULT_CONFIG,
   isVoiceName,
+  MULTILINGUAL_VOICES,
   normalizeConfig,
   voiceFor,
   VOICES,
@@ -14,7 +15,11 @@ const names = new Set(SERVICE_VOICES.map((voice) => voice.ShortName));
 const auto = (gender = 'female') => ({ ...DEFAULT_CONFIG, gender });
 
 test('every voice the integration names exists in the list of the service', () => {
-  for (const voice of [...VOICES, ...Object.values(AUTO_VOICES).flatMap(Object.values)]) {
+  for (const voice of [
+    ...VOICES,
+    ...Object.values(AUTO_VOICES).flatMap(Object.values),
+    ...Object.values(MULTILINGUAL_VOICES),
+  ]) {
     assert.ok(names.has(voice), voice);
   }
   const genders = Object.fromEntries(SERVICE_VOICES.map((v) => [v.ShortName, v.Gender]));
@@ -71,9 +76,9 @@ test('automatic mode finds the other languages and the regions in the list', () 
   assert.equal(voiceFor(auto(), 'en-GB', SERVICE_VOICES), 'en-GB-LibbyNeural');
   // The region of the usual voice keeps it.
   assert.equal(voiceFor(auto(), 'fr-FR', SERVICE_VOICES), 'fr-FR-DeniseNeural');
-  // A language the service lacks, or no list: French.
-  assert.equal(voiceFor(auto(), 'tlh', SERVICE_VOICES), 'fr-FR-DeniseNeural');
-  assert.equal(voiceFor(auto('male'), 'pl', null), 'fr-FR-HenriNeural');
+  // A language the service lacks, or no list: a multilingual voice.
+  assert.equal(voiceFor(auto(), 'tlh', SERVICE_VOICES), 'en-US-AvaMultilingualNeural');
+  assert.equal(voiceFor(auto('male'), 'pl', null), 'en-US-AndrewMultilingualNeural');
 });
 
 test('a chosen voice wins over the language, and the other voice over both', () => {

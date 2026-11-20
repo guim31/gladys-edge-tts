@@ -62,6 +62,12 @@ export const AUTO_VOICES = {
   pt: { female: 'pt-PT-RaquelNeural', male: 'pt-PT-DuarteNeural' },
 };
 
+// Voices that read the text in its own language, whatever it is.
+export const MULTILINGUAL_VOICES = {
+  female: 'en-US-AvaMultilingualNeural',
+  male: 'en-US-AndrewMultilingualNeural',
+};
+
 // Voice language when Gladys gives none (an instance without administrator):
 // the default of Guilhem's integrations.
 export const FALLBACK_LANGUAGE = 'fr';
@@ -184,7 +190,12 @@ export function voiceFor(settings, userLanguage, voices) {
     return known[settings.gender];
   }
   const found = inLanguage.find((voice) => voice.Gender === gender) ?? inLanguage[0];
-  return found ? found.ShortName : AUTO_VOICES[FALLBACK_LANGUAGE][settings.gender];
+  if (found) {
+    return found.ShortName;
+  }
+  // A language without a voice of its own, or the list unknown: a multilingual
+  // voice reads most languages, where a French voice would read them badly.
+  return MULTILINGUAL_VOICES[settings.gender];
 }
 
 /**

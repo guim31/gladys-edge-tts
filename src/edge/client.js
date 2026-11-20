@@ -181,11 +181,12 @@ export class EdgeTtsClient {
 
   /**
    * The list of voices of the service.
+   * @param {{timeoutMs?: number}} [options] - Bound of the request.
    * @returns {Promise<{ShortName: string, Gender: string, Locale: string}[]>} The voices.
    * @throws {EdgeTtsError} On any failure.
    */
-  async listVoices() {
-    const response = await this.get(VOICES_URL);
+  async listVoices({ timeoutMs = this.requestTimeoutMs } = {}) {
+    const response = await this.get(VOICES_URL, timeoutMs);
     let voices;
     try {
       voices = JSON.parse(await response.text());
@@ -201,10 +202,11 @@ export class EdgeTtsClient {
   /**
    * GET a URL of the service, with the token.
    * @param {string} base - The URL, without parameters.
+   * @param {number} [timeoutMs] - Bound of the request.
    * @returns {Promise<Response>} A successful response.
    * @throws {EdgeTtsError} On any failure.
    */
-  async get(base) {
+  async get(base, timeoutMs = this.requestTimeoutMs) {
     const url = new URL(base);
     url.searchParams.set('trustedclienttoken', TRUSTED_CLIENT_TOKEN);
     url.searchParams.set('Sec-MS-GEC', this.token());
@@ -217,11 +219,11 @@ export class EdgeTtsClient {
           Accept: '*/*',
           'Accept-Language': 'en-US,en;q=0.9',
         },
-        signal: AbortSignal.timeout(this.requestTimeoutMs),
+        signal: AbortSignal.timeout(timeoutMs),
       });
     } catch (err) {
       if (err?.name === 'TimeoutError' || err?.name === 'AbortError') {
-        throw new EdgeTtsError('timeout', `no answer within ${this.requestTimeoutMs} ms`, {
+        throw new EdgeTtsError('timeout', `no answer within ${timeoutMs} ms`, {
           cause: err,
         });
       }
@@ -238,12 +240,13 @@ export class EdgeTtsClient {
   /**
    * After a failed handshake: is the service reachable, and is our clock
    * right? Reads the `Date` of the service on its voice list.
+   * @param {number} [timeoutMs] - Bound of the request.
    * @returns {Promise<void>}
    * @throws {EdgeTtsError} `unreachable` or `timeout` when the service cannot
    *   be reached at all.
    */
-  async syncClock() {
-    const response = await this.get(VOICES_URL);
+  async syncClock(timeoutMs = this.requestTimeoutMs) {
+    const response = await this.get(VOICES_URL, timeoutMs);
     // The body is not needed; let the connection go.
     await response.body?.cancel();
     const date = Date.parse(response.headers.get('date') ?? '');
@@ -374,6 +377,9 @@ export class EdgeTtsClient {
           finish(new EdgeTtsError('unknown_voice', reason));
         } else if (!opened) {
           finish(new EdgeTtsError('handshake', `closed before opening (${event.code})`));
+        } else if (event.code === 1006) {
+          // Abnormal closure: the connection dropped, nothing the service said.
+          finish(new EdgeTtsError('unreachable', 'connection lost during the synthesis'));
         } else if (event.code === 1011 || event.code === 1013) {
           finish(new EdgeTtsError('server', `closed by the service: ${event.code} ${reason}`));
         } else {
@@ -411,7 +417,7 @@ export class EdgeTtsClient {
       }
     }
     // Throws `unreachable` when the service cannot be reached at all.
-    await this.syncClock();
+    await this.syncClock(left());
     try {
       return await this.speakChunk({ ssml, timeoutMs: left() });
     } catch (err) {

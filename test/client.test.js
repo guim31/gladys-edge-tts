@@ -138,6 +138,11 @@ test('a handshake refused twice is "refused"; no network at all is "unreachable"
   assert.equal(offline.connections.length, 1);
 });
 
+test('an abnormal closure after opening is "unreachable"', async () => {
+  const { client: edge } = client(() => ({ close: [1006, ''] }));
+  await assert.rejects(edge.synthesize(request('Oui.')), { kind: 'unreachable' });
+});
+
 test('a connection lost during the synthesis is "unreachable"', async () => {
   const { client: edge } = client(() => ({ session: OUI_SESSION, lose: true }));
   await assert.rejects(edge.synthesize(request('Oui.')), { kind: 'unreachable' });

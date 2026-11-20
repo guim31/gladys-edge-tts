@@ -31,6 +31,10 @@ export const CACHE_SIZE = 16;
 export const MAX_CLIP_BYTES = 5 * 1000 * 1000;
 // The voice list changes rarely: read again once a day at most.
 export const VOICES_TTL_MS = 24 * 60 * 60 * 1000;
+// After a failed read, a synthesis does not wait for the list again before this.
+export const VOICES_RETRY_MS = 60 * 1000;
+// A synthesis waits this long at most for the list (Gladys waits 30 s in all).
+export const VOICES_TIMEOUT_MS = 4000;
 // Voices listed by the "List the voices" button, at most.
 const MAX_LISTED = 12;
 
@@ -259,6 +263,8 @@ export class EdgeTts {
     // The service's voice list, read when needed: { at, voices } or null.
     this.voices = null;
     this.voicesLoading = null;
+    // When the last read of the list failed, null otherwise.
+    this.voicesFailedAt = null;
   }
 
   /**
@@ -315,6 +321,10 @@ export class EdgeTts {
     }
     this.loading ??= this.gladys.getConfig().then(
       (config) => {
+        // A configuration pushed meanwhile (onConfigUpdated) is newer: keep it.
+        if (this.loaded) {
+          return;
+        }
         this.useConfig(config);
         // Not awaited: the request waiting for this configuration has its
         // own time budget. check() never rejects.
@@ -339,10 +349,18 @@ export class EdgeTts {
     if (this.voices && this.now() - this.voices.at < VOICES_TTL_MS) {
       return this.voices.voices;
     }
+    if (
+      !required &&
+      this.voicesFailedAt !== null &&
+      this.now() - this.voicesFailedAt < VOICES_RETRY_MS
+    ) {
+      return this.voices?.voices ?? null;
+    }
     this.voicesLoading ??= this.client
-      .listVoices()
+      .listVoices(required ? {} : { timeoutMs: VOICES_TIMEOUT_MS })
       .then((voices) => {
         this.voices = { at: this.now(), voices };
+        this.voicesFailedAt = null;
         return voices;
       })
       .finally(() => {
@@ -354,6 +372,7 @@ export class EdgeTts {
       if (required) {
         throw err;
       }
+      this.voicesFailedAt = this.now();
       this.logger.debug(`Voice list not read: ${err.message}`);
       return this.voices?.voices ?? null;
     }
@@ -543,6 +562,8 @@ export class EdgeTts {
     try {
       await this.gladys.setConnectionStatus(connected, message);
     } catch (statusErr) {
+      // Not shown: publish it again next time.
+      this.status = null;
       this.logger.warn(`Unable to publish the status: ${statusErr.message}`);
     }
   }

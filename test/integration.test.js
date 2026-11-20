@@ -79,14 +79,27 @@ test('another language reads the voice list once, then keeps it', async () => {
   assert.equal(fetch.calls.length, 1);
 });
 
-test('the voice list unreadable: a language of its own still speaks, others in French', async () => {
-  const { gladys, connections } = await setup({
-    fetch: fakeFetch(() => new Response('', { status: 503 })),
-  });
+test('the voice list unreadable: a language of its own still speaks, others multilingual', async () => {
+  const fetch = fakeFetch(() => new Response('', { status: 503 }));
+  const { gladys, connections } = await setup({ fetch });
   await gladys.fake.ttsSynthesize('Drzwi są otwarte.', 'pl');
-  assert.equal(connections.at(-1).voice, 'fr-FR-DeniseNeural');
+  assert.equal(connections.at(-1).voice, 'en-US-AvaMultilingualNeural');
   await gladys.fake.ttsSynthesize('Die Tür ist offen.', 'de');
   assert.equal(connections.at(-1).voice, 'de-DE-TanjaNeural');
+  // A failed list is not asked again by every synthesis.
+  await gladys.fake.ttsSynthesize('Okno jest otwarte.', 'pl');
+  assert.equal(fetch.calls.length, 1);
+});
+
+test('a configuration pushed while the first one is read wins', async () => {
+  const { gladys, tts } = await setup({ config: { rate: 10 }, connect: false });
+  let release;
+  gladys.getConfig = () => new Promise((resolve) => (release = resolve));
+  const pending = tts.load();
+  await tts.applyConfig({ rate: 30 });
+  release({ rate: 10 });
+  await pending;
+  assert.equal(tts.settings.rate, 30);
 });
 
 test('the same announcement on several speakers is asked once', async () => {
